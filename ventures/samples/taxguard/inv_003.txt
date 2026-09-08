@@ -1,0 +1,5 @@
+INVOICE 88213
+From: Quantum Data Services, Inc.
+Bill To: Brightline Analytics LLC
+Monthly platform fee ................. $3,200.00
+Total: $3,200.00

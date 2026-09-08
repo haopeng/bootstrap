@@ -32,3 +32,9 @@ nbproject
 .svn
 .CVS
 .idea
+# ventures
+__pycache__/
+*.pyc
+ventures/out/
+*.db
+.pytest_cache/
