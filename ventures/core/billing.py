@@ -34,8 +34,8 @@ PRICING: dict[str, list[Plan]] = {
         Plan("launchradar", "Studio", 99, "per month", "15 products, hourly scan, Slack/Discord digest", 15.0),
     ],
     "dunning": [
-        Plan("dunning", "Starter", 39, "per month", "up to 100 open invoices, 4-step sequence, reply triage", 3.0),
-        Plan("dunning", "Recovered", 0, "2% of collected", "no monthly fee; billed on what actually gets paid", 3.0),
+        Plan("dunning", "Recovered", 0, "10% of recovered", "no monthly fee; QuickBooks sync, email + disclosed AI calls, billed only on attributed recoveries", 3.0),
+        Plan("dunning", "Flat", 39, "per month", "same product for businesses that prefer a fixed fee; up to 100 open invoices", 3.0),
     ],
     "reviewreply": [
         Plan("reviewreply", "Local", 19, "per month", "1 location, unlimited drafted replies, weekly sentiment digest", 1.5),

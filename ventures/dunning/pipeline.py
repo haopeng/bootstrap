@@ -5,6 +5,7 @@ from datetime import date, datetime
 from ventures.core import Store, get_llm, render_markdown
 
 from . import engine, messages
+from . import voice as voicecall
 from .engine import Invoice
 
 REPLY_SCHEMA = {
@@ -42,11 +43,17 @@ def run_day(invoices: list[Invoice], sender: str, today: date | None = None, utc
         msg = messages.compose(inv, name, today, sender, voice)
         messages.send_email(msg, lambda k, d: store.log(jid, k, {"invoice": inv.id, **d}))
         inv.sent_steps.append(name)
-        sent.append({"invoice": inv.id, "step": name, "subject": msg["subject"], "late_fee": msg["late_fee"]})
+        inv.last_touch = today
+        entry = {"invoice": inv.id, "step": name, "profile": msg["profile"], "subject": msg["subject"], "late_fee": msg["late_fee"]}
+        if name in engine.CALL_AT[msg["profile"]]:
+            call = voicecall.place_call(inv, today, sender, lambda k, d: store.log(jid, k, d))
+            entry["call"] = "placed" if call["placed"] else f"not placed: {call['reason']}"
+        sent.append(entry)
 
     open_total = sum(i.amount for i in invoices if i.status == "open")
-    findings = [{"severity": "info", "title": f"{s['invoice']}: sent '{s['step']}'", "detail": s["subject"],
-                 "action": f"late fee applied: {s['late_fee']}" if s["late_fee"] else ""} for s in sent]
+    findings = [{"severity": "info", "title": f"{s['invoice']}: sent '{s['step']}' ({s['profile']} tone)", "detail": s["subject"],
+                 "action": "; ".join(x for x in [f"late fee applied: {s['late_fee']:.2f}" if s["late_fee"] else "",
+                                                 f"call {s['call']}" if s.get("call") else ""] if x)} for s in sent]
     findings += [{"severity": "high", "title": f"{h}: 30+ days — needs a human decision",
                   "detail": "Automated sequence complete.", "action": "Call the customer; offer a payment plan; decide on write-off or a licensed agency."} for h in handoff]
     findings += [{"severity": "low", "title": f"{i}: '{n}' deferred", "detail": why, "action": ""} for i, n, why in skipped]
@@ -64,7 +71,7 @@ def handle_reply(inv: Invoice, text: str, today: date | None = None, store: Stor
     store = store or Store()
     today = today or date.today()
     rules = engine.triage(text)
-    intent, promise = rules["intent"], None
+    intent, promise = rules["intent"], engine.parse_promise(text, today)
     llm = get_llm()
     if llm.available:
         out = llm.json(REPLY_SCHEMA, f"Customer reply to an invoice reminder:\n\n{text}", effort="low")
@@ -72,7 +79,7 @@ def handle_reply(inv: Invoice, text: str, today: date | None = None, store: Stor
             # Rules win on the safety-critical intents; the model refines the rest.
             if intent not in ("stop", "dispute"):
                 intent = out["intent"]
-            if out["promise_date"]:
+            if out["promise_date"] and not promise:
                 try:
                     promise = date.fromisoformat(out["promise_date"])
                 except ValueError:

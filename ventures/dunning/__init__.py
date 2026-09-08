@@ -7,7 +7,10 @@ both legal and lucrative is *first-party* accounts-receivable follow-up: a
 business reminding its own customers about its own invoices.  Dunning runs a
 4-step sequence, in the customer's business hours, stops the moment a customer
 disputes or asks it to, never threatens, and only mentions late fees that the
-contract actually allows.  Priced at $39/mo or 2% of what it recovers.
+contract actually allows.  It reads open invoices and payment history straight
+from QuickBooks, tunes tone and cadence to each customer's record, places a
+disclosed AI call on the firm/final steps, and turns "we'll pay next week" into
+a dated promise.  No monthly fee: 10% of attributed recoveries.
 """
 from .pipeline import run_day, handle_reply
 

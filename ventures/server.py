@@ -23,7 +23,7 @@ PRODUCTS = {
     "taxguard": ("TaxGuard", "Contract & 1099 review for small businesses", "Upload contracts and invoices; get flagged clauses, 1099 exposure and a filing checklist."),
     "dealscout": ("DealScout", "Distressed-property leads, done by the book", "Public-record leads ranked by motivation, owner letters, deal memos. Consent-gated outreach."),
     "launchradar": ("LaunchRadar", "Find the conversations your product belongs in", "HN + Reddit monitoring, relevance scoring, honest reply drafts. You post; we never do."),
-    "dunning": ("Dunning", "Polite invoice follow-up on autopilot", "4-step reminders in your customer's business hours. Stops on disputes. Never a collector."),
+    "dunning": ("Dunning", "Polite invoice follow-up on autopilot", "Syncs with QuickBooks, tunes tone to each customer's payment history, emails and makes disclosed AI calls in business hours, understands \"we'll pay next week\". No monthly fee: 10% of what it recovers."),
     "reviewreply": ("ReviewReply", "Answer every review in your voice", "Drafted replies to Google/Yelp reviews + a weekly sentiment digest for local businesses."),
     "bidscout": ("BidScout", "Government bids matched to your shop", "SAM.gov and state portals screened against your NAICS, certs and area. Go/no-go memos + calendar."),
     "leasecheck": ("LeaseCheck", "Read your lease before you sign it", "Red flags in plain English, your state's rules, and a negotiation email. $19."),
@@ -60,7 +60,7 @@ FORMS = {
     "taxguard": '<form method="post" action="/api/taxguard" enctype="multipart/form-data"><input type="file" name="files" multiple> <button class="btn btn-primary">Review</button></form>',
     "dealscout": '<form method="post" action="/api/dealscout" enctype="multipart/form-data"><input type="file" name="csv"> <input name="company" placeholder="Your company"> <input name="sender" placeholder="Your name"> <input name="phone" placeholder="Phone"> <button class="btn btn-primary">Scan</button></form>',
     "launchradar": '<form method="post" action="/api/launchradar"><input name="product" placeholder="Product name"><br><textarea name="description" rows="4" cols="80" placeholder="What it does, who it is for, what pain it removes"></textarea><br><label><input type="checkbox" name="live" value="1"> Search HN + Reddit live</label> <button class="btn btn-primary">Scan</button></form>',
-    "dunning": '<form method="post" action="/api/dunning" enctype="multipart/form-data"><input type="file" name="csv"> <input name="sender" placeholder="Signature, e.g. Sam at Ortiz Studio"> <button class="btn btn-primary">Run today</button></form><p><small>CSV columns: id,customer,email,amount,due,pay_url,late_fee_allowed,late_fee_pct</small></p>',
+    "dunning": '<form method="post" action="/api/dunning" enctype="multipart/form-data"><input type="file" name="file"> <input name="sender" placeholder="Signature, e.g. Sam at Ortiz Studio"> <button class="btn btn-primary">Run today</button></form><p><small>Upload a QuickBooks export (.json) or a CSV with id,customer,email,amount,due,pay_url,phone,late_fee_allowed,late_fee_pct. Production: connect QuickBooks via OAuth and this runs every morning.</small></p>',
     "reviewreply": '<form method="post" action="/api/reviewreply" enctype="multipart/form-data"><input type="file" name="json"> <input name="business" placeholder="Business"> <input name="owner" placeholder="Owner first name"> <input name="contact" placeholder="Contact email/phone"> <button class="btn btn-primary">Draft replies</button></form>',
     "bidscout": '<form method="post" action="/api/bidscout" enctype="multipart/form-data"><input type="file" name="json"> <input name="company" placeholder="Company"> <input name="naics" placeholder="NAICS, comma separated"> <input name="keywords" placeholder="keywords"> <input name="states" placeholder="TX,OK"> <input name="certs" placeholder="SB,SDVOSB"> <button class="btn btn-primary">Screen</button></form>',
     "leasecheck": '<form method="post" action="/api/leasecheck"><textarea name="text" rows="10" cols="90" placeholder="Paste your lease"></textarea><br><input name="state" placeholder="State (TX)"> <button class="btn btn-primary">Check my lease</button></form>',
@@ -101,14 +101,19 @@ async def api_launchradar(product: str = Form(...), description: str = Form(...)
 
 
 @app.post("/api/dunning")
-async def api_dunning(csv: UploadFile = File(...), sender: str = Form(...)):
+async def api_dunning(file: UploadFile = File(...), sender: str = Form(...)):
+    """Accepts a QuickBooks export (.json, shape of quickbooks.fetch_open_invoices) or a CSV."""
     import csv as _csv, io
-    from ventures.dunning import run_day
+    from ventures.dunning import quickbooks as qb, run_day
     from ventures.dunning.engine import Invoice
-    rows = _csv.DictReader(io.StringIO((await csv.read()).decode()))
-    invs = [Invoice(r["id"], r["customer"], r["email"], float(r["amount"]), date.fromisoformat(r["due"]), pay_url=r.get("pay_url", ""),
-                    late_fee_allowed=r.get("late_fee_allowed", "").lower() in ("1", "true", "yes"), late_fee_pct=float(r.get("late_fee_pct") or 0))
-            for r in rows]
+    raw = (await file.read()).decode()
+    if file.filename.lower().endswith(".json"):
+        invs = qb.to_invoices(json.loads(raw))
+    else:
+        rows = _csv.DictReader(io.StringIO(raw))
+        invs = [Invoice(r["id"], r["customer"], r["email"], float(r["amount"]), date.fromisoformat(r["due"]), pay_url=r.get("pay_url", ""),
+                        phone=r.get("phone", ""), late_fee_allowed=r.get("late_fee_allowed", "").lower() in ("1", "true", "yes"),
+                        late_fee_pct=float(r.get("late_fee_pct") or 0)) for r in rows]
     r = run_day(invs, sender, store=Store())
     return _md(r["report_md"], {"job_id": r["job_id"], "sent": len(r["sent"])})
 

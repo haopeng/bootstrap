@@ -31,13 +31,29 @@ POLISH_SCHEMA = {"type": "object", "properties": {"subject": {"type": "string"},
                  "required": ["subject", "body"], "additionalProperties": False}
 
 
+OPENERS = {
+    "warm": "Hi {first},\n\nHope things are going well on your end — you've been a great customer for years, so this is just housekeeping. ",
+    "standard": "Hi {first},\n\n",
+    "urgent": "Hi {first},\n\n",
+}
+CLOSERS = {
+    "warm": "\n\nNo rush if it's already in your next pay run. Thanks as always!",
+    "standard": "",
+    "urgent": "\n\nWe've had a few invoices run past due recently, so I'd appreciate a quick confirmation either way.",
+}
+
+
 def compose(inv: Invoice, step: str, today: date, sender: str, voice: str = "") -> dict:
+    profile = inv.history.profile()
     fee = late_fee(inv, today)
     fee_line = f" Per our terms a late fee of {inv.currency} {fee:,.2f} now applies." if fee else ""
     ctx = dict(id=inv.id, first=inv.customer.split()[0], amount=f"{inv.currency} {inv.amount:,.2f}",
                due=inv.due.strftime("%b %d"), days=(today - inv.due).days, pay_url=inv.pay_url or "(payment link)",
                sender=sender, fee_line=fee_line, deadline=date.fromordinal(today.toordinal() + 5).strftime("%b %d"))
     subject, body = (t.format(**ctx) for t in TEMPLATES[step])
+    body = OPENERS[profile].format(**ctx) + body.split("\n\n", 1)[1]
+    if step in ("gentle", "firm"):
+        body = body.replace(f"\n\n{sender}", CLOSERS[profile] + f"\n\n{sender}")
     llm = get_llm()
     if llm.available and voice:
         out = llm.json(POLISH_SCHEMA,
@@ -47,7 +63,7 @@ def compose(inv: Invoice, step: str, today: date, sender: str, voice: str = "") 
         if out and not BANNED.search(out["body"]) and (inv.pay_url in out["body"] or not inv.pay_url):
             subject, body = out["subject"], out["body"]
     assert not BANNED.search(body), "template violated tone rules"
-    return {"to": inv.email, "subject": subject, "body": body, "step": step, "late_fee": fee}
+    return {"to": inv.email, "subject": subject, "body": body, "step": step, "late_fee": fee, "profile": profile}
 
 
 def send_email(msg: dict, log) -> dict:

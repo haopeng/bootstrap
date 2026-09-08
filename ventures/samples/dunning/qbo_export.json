@@ -1,0 +1,28 @@
+{
+ "open": [
+  {"Id":"1101","DocNumber":"INV-1101","TxnDate":"2026-08-12","DueDate":"2026-09-11","TotalAmt":1200.00,"Balance":1200.00,
+   "CustomerRef":{"value":"C1","name":"Acme Logistics"},"BillEmail":{"Address":"ap@acme.example"},"CustomerPhone":"512-555-0301"},
+  {"Id":"1097","DocNumber":"INV-1097","TxnDate":"2026-08-08","DueDate":"2026-09-07","TotalAmt":850.00,"Balance":850.00,
+   "CustomerRef":{"value":"C2","name":"Northco Builders"},"BillEmail":{"Address":"ben@northco.example"},"CustomerPhone":"512-555-0302"},
+  {"Id":"1088","DocNumber":"INV-1088","TxnDate":"2026-08-01","DueDate":"2026-08-31","TotalAmt":3400.00,"Balance":3400.00,
+   "CustomerRef":{"value":"C3","name":"Studio Fischer"},"BillEmail":{"Address":"lena@studio.example"},"CustomerPhone":"512-555-0303"},
+  {"Id":"1070","DocNumber":"INV-1070","TxnDate":"2026-06-20","DueDate":"2026-07-20","TotalAmt":560.00,"Balance":560.00,
+   "CustomerRef":{"value":"C4","name":"Haddad Wholesale"},"BillEmail":{"Address":"omar@haddad.example"}},
+  {"Id":"1099","DocNumber":"INV-1099","TxnDate":"2026-08-08","DueDate":"2026-09-07","TotalAmt":200.00,"Balance":200.00,
+   "CustomerRef":{"value":"C5","name":"Wong Imports"},"BillEmail":{"Address":"kai@wong.example"}}
+ ],
+ "paid": [
+  {"Id":"901","DocNumber":"INV-901","TxnDate":"2024-01-10","DueDate":"2024-02-09","TotalAmt":1100,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2024-02-05"},
+  {"Id":"920","DocNumber":"INV-920","TxnDate":"2024-04-10","DueDate":"2024-05-10","TotalAmt":1100,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2024-05-08"},
+  {"Id":"940","DocNumber":"INV-940","TxnDate":"2024-07-10","DueDate":"2024-08-09","TotalAmt":1150,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2024-08-12"},
+  {"Id":"960","DocNumber":"INV-960","TxnDate":"2024-10-10","DueDate":"2024-11-09","TotalAmt":1150,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2024-11-04"},
+  {"Id":"980","DocNumber":"INV-980","TxnDate":"2025-01-10","DueDate":"2025-02-09","TotalAmt":1200,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2025-02-07"},
+  {"Id":"1000","DocNumber":"INV-1000","TxnDate":"2025-04-10","DueDate":"2025-05-10","TotalAmt":1200,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2025-05-09"},
+  {"Id":"1020","DocNumber":"INV-1020","TxnDate":"2025-07-10","DueDate":"2025-08-09","TotalAmt":1200,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2025-08-01"},
+  {"Id":"1040","DocNumber":"INV-1040","TxnDate":"2026-01-10","DueDate":"2026-02-09","TotalAmt":1200,"Balance":0,"CustomerRef":{"value":"C1","name":"Acme Logistics"},"PaidDate":"2026-02-06"},
+  {"Id":"1010","DocNumber":"INV-1010","TxnDate":"2025-09-01","DueDate":"2025-10-01","TotalAmt":3000,"Balance":0,"CustomerRef":{"value":"C3","name":"Studio Fischer"},"PaidDate":"2025-11-05"},
+  {"Id":"1030","DocNumber":"INV-1030","TxnDate":"2025-12-01","DueDate":"2025-12-31","TotalAmt":3200,"Balance":0,"CustomerRef":{"value":"C3","name":"Studio Fischer"},"PaidDate":"2026-01-28"},
+  {"Id":"1050","DocNumber":"INV-1050","TxnDate":"2026-03-01","DueDate":"2026-03-31","TotalAmt":3300,"Balance":0,"CustomerRef":{"value":"C3","name":"Studio Fischer"},"PaidDate":"2026-05-02"},
+  {"Id":"1060","DocNumber":"INV-1060","TxnDate":"2026-05-01","DueDate":"2026-05-31","TotalAmt":800,"Balance":0,"CustomerRef":{"value":"C2","name":"Northco Builders"},"PaidDate":"2026-06-10"}
+ ]
+}

@@ -53,20 +53,23 @@ def run_all(store: Store | None = None, verbose: bool = True) -> dict[str, dict]
         threads=threads, store=store, now=1757300000)
 
     from ventures.dunning import handle_reply, run_day
-    from ventures.dunning.engine import Invoice
-    invoices = [
-        Invoice("INV-101", "Priya Shah", "priya@acme.example", 1200, date(2026, 9, 11), pay_url="https://pay.example/101"),
-        Invoice("INV-097", "Ben Carter", "ben@northco.example", 850, date(2026, 9, 7), pay_url="https://pay.example/097"),
-        Invoice("INV-088", "Lena Fischer", "lena@studio.example", 3400, date(2026, 8, 31), late_fee_allowed=True,
-                late_fee_pct=1.5, pay_url="https://pay.example/088"),
-        Invoice("INV-070", "Omar Haddad", "omar@haddad.example", 560, date(2026, 7, 20), pay_url="https://pay.example/070"),
-        Invoice("INV-099", "Kai Wong", "kai@wong.example", 200, date(2026, 9, 7), tz_offset_hours=-10, pay_url="https://pay.example/099"),
-    ]
+    from ventures.dunning import quickbooks as qb
+    from ventures.dunning.recovery import RecoveryLedger
+    from ventures.dunning.voice import handle_transcript
+    payload = qb.load_export(os.path.join(SAMPLES, "dunning", "qbo_export.json"))  # stands in for a live QBO pull
+    invoices = qb.to_invoices(payload, today=TODAY)
     results["dunning"] = run_day(invoices, "Sam at Ortiz Studio", today=TODAY, utc_now=NOW, store=store)
+    by_id = {i.id: i for i in invoices}
     results["dunning"]["replies"] = [
-        handle_reply(invoices[2], "This is the wrong amount, we agreed on 3000.", today=TODAY, store=store),
-        handle_reply(invoices[1], "Sorry, will pay by Friday", today=TODAY, store=store),
+        handle_transcript(by_id["INV-1088"], "Sorry, our AP runs Thursdays, we'll pay next week.", TODAY, "Sam"),
+        handle_reply(by_id["INV-1097"], "This is the wrong amount, we agreed on 800.", today=TODAY, store=store),
     ]
+    ledger = RecoveryLedger()
+    ledger.record(by_id["INV-1088"], 3400, date(2026, 9, 17), by_id["INV-1088"].last_touch)
+    results["dunning"]["statement"] = ledger.statement("2026-09")
+    results["dunning"]["report_md"] += (
+        "\n## Call outcome\n\n" + results["dunning"]["replies"][0]["closing_line"]
+        + f"\n\n## Fee statement (10% of attributed recoveries)\n\n{results['dunning']['statement']}\n")
 
     from ventures.reviewreply import run as rr_run
     with open(os.path.join(SAMPLES, "reviewreply", "reviews.json")) as f:
@@ -97,7 +100,8 @@ def run_all(store: Store | None = None, verbose: bool = True) -> dict[str, dict]
             first = r["report_md"].split("\n\n")[1].split("\n")[0]
             plan = quote(name)[0]
             print(f"  {name:12s} {first[:95]}")
-            print(f"  {'':12s} price: ${plan.price_usd:g} {plan.unit}  est. model cost/unit: ${plan.est_llm_cost_usd:.2f}")
+            price = f"${plan.price_usd:g} {plan.unit}" if plan.price_usd else plan.unit
+            print(f"  {'':12s} price: {price}  est. model cost/unit: ${plan.est_llm_cost_usd:.2f}")
         if llm.available:
             u = llm.usage
             print(f"\nModel usage: {u.calls} calls, {u.input_tokens} in / {u.output_tokens} out, ≈ ${u.cost_usd:.3f}")
