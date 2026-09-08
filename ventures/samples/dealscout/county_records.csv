@@ -1,0 +1,8 @@
+signal,parcel,address,city,state,zip,owner,owner_mailing,assessed_value,filed,amount,phone,notes
+probate,12-034-118,418 Maple Ave,Round Rock,TX,78664,Harold Jenkins Estate,"2201 Lakeshore Dr, Austin TX 78730",265000,2026-08-12,0,,Estate opened; heir out of state
+tax_lien,12-034-118,418 Maple Ave,Round Rock,TX,78664,Harold Jenkins,"2201 Lakeshore Dr, Austin TX 78730",265000,2026-05-03,7400,,2 yrs delinquent
+pre_foreclosure,07-221-009,1907 Cedar Bend,Pflugerville,TX,78660,Dana Whitfield,1907 Cedar Bend Pflugerville TX 78660,310000,2026-08-28,42000,512-555-0142,Notice of default recorded
+code_violation,07-221-009,1907 Cedar Bend,Pflugerville,TX,78660,Dana Whitfield,1907 Cedar Bend Pflugerville TX 78660,310000,2026-07-15,850,512-555-0142,Roof / fence citations
+vacant,03-118-441,55 Quarry Rd,Hutto,TX,78634,Northline Holdings LLC,"PO Box 9912, Dallas TX 75201",180000,2025-11-02,0,,USPS vacancy flag
+tax_lien,09-410-002,3320 Elm St,Taylor,TX,76574,Rosa Alvarez,3320 Elm St Taylor TX 76574,142000,2026-02-19,3100,512-555-0199,
+divorce,15-002-733,880 Ridgeview Ct,Georgetown,TX,78626,Mark & Lisa Chen,880 Ridgeview Ct Georgetown TX 78626,415000,2024-12-01,0,,

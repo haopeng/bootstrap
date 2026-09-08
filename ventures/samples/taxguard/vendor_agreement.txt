@@ -1,0 +1,25 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement ("Agreement") is entered into between Brightline Analytics LLC ("Client")
+and Quantum Data Services, Inc. ("Vendor"). Each a "Party".
+
+1. Term. The initial term is twelve (12) months. This Agreement shall automatically renew for successive
+twelve (12) month periods unless either Party provides written notice of non-renewal at least ninety (90)
+days prior to the end of the then-current term.
+
+2. Fees. Client shall pay all invoices Net 30. A late fee of 1.5% per month applies to overdue amounts.
+Vendor reserves the right to modify pricing at any time without notice.
+
+3. Indemnification. Client shall indemnify, defend and hold harmless Vendor from any and all claims,
+losses, damages and expenses arising out of or related to Client's use of the Services.
+
+4. Non-Competition. During the term and for twenty-four (24) months thereafter, Client shall not engage
+any competing data services provider.
+
+5. Assignment. Client may not assign this Agreement without the prior written consent of Vendor.
+
+6. Confidentiality. Each Party shall keep Confidential Information confidential for a period of 5 years.
+
+7. Governing Law. This Agreement is governed by the laws of the State of Delaware.
+
+IN WITNESS WHEREOF the Parties hereby execute this Agreement.
